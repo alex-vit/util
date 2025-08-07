@@ -13,7 +13,7 @@ func Read(file string) string {
 
 func Grid(input string) [][]uint8 {
 	chars := [][]uint8{}
-	for _, line := range Lines(input) {
+	for _, line := range NonEmptyLines(input) {
 		chars = append(chars, []uint8(line))
 	}
 	return chars
@@ -31,8 +31,15 @@ func GridStr(G [][]uint8) string {
 	return sb.String()
 }
 
-func Lines(s string) []string {
-	return strings.Split(strings.TrimSpace(s), "\n")
+// returns non-empty lines
+func NonEmptyLines(s string) (lines []string) {
+	s=strings.TrimSpace(s)
+	for _, line := range strings.Split(s, "\n") {
+		if line != "" {
+			lines = append(lines, line)
+		}
+	}
+	return lines
 }
 
 func Blocks(s string) (blocks []string) {
@@ -52,7 +59,7 @@ func Num(s string) int {
 
 func Numbers(input string, separator string) [][]int {
 	numbers := [][]int{}
-	for _, line := range Lines(input) {
+	for _, line := range NonEmptyLines(input) {
 		tokens := strings.Split(line, separator)
 		var row []int
 		for i := range tokens {

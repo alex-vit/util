@@ -16,7 +16,7 @@ type Grid struct {
 }
 
 func Parse(s string) *Grid {
-	lines := util.Lines(s)
+	lines := util.NonEmptyLines(s)
 	a := make([][]byte, 0, len(lines))
 	for _, line := range lines {
 		a = append(a, []byte(line))
