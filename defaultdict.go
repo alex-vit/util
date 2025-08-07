@@ -6,24 +6,24 @@ import (
 	"strings"
 )
 
-type DefDict[K comparable, V any] struct {
+type DefaultDict[K comparable, V any] struct {
 	M  map[K]V
 	mk func() V
 }
 
-func NewDefDict[K comparable, V any]() *DefDict[K, V] {
+func NewDefaultDict[K comparable, V any]() *DefaultDict[K, V] {
 	mkZero := func() V {
 		var v V
 		return v
 	}
-	return NewDefDictF[K](mkZero)
+	return NewDefaultDictF[K](mkZero)
 }
 
-func NewDefDictF[K comparable, V any](mk func() V) *DefDict[K, V] {
-	return &DefDict[K, V]{M: make(map[K]V), mk: mk}
+func NewDefaultDictF[K comparable, V any](mk func() V) *DefaultDict[K, V] {
+	return &DefaultDict[K, V]{M: make(map[K]V), mk: mk}
 }
 
-func (d *DefDict[K, V]) Get(k K) V {
+func (d *DefaultDict[K, V]) Get(k K) V {
 	v, ok := d.M[k]
 	if !ok {
 		v = d.mk()
@@ -32,15 +32,15 @@ func (d *DefDict[K, V]) Get(k K) V {
 	return v
 }
 
-func (d *DefDict[K, V]) Put(k K, v V) {
+func (d *DefaultDict[K, V]) Put(k K, v V) {
 	d.M[k] = v
 }
 
-func (d *DefDict[K, V]) Clear() {
+func (d *DefaultDict[K, V]) Clear() {
 	clear(d.M)
 }
 
-func (d DefDict[K, V]) Keys() iter.Seq[K] {
+func (d DefaultDict[K, V]) Keys() iter.Seq[K] {
 	return func(yield func(K) bool) {
 		for k, _ := range d.M {
 			if !yield(k) {
@@ -50,7 +50,7 @@ func (d DefDict[K, V]) Keys() iter.Seq[K] {
 	}
 }
 
-func (d DefDict[K, V]) String() string {
+func (d DefaultDict[K, V]) String() string {
 	var sb strings.Builder
 	sb.WriteString("{\n")
 	for k, v := range d.M {
