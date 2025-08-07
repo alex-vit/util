@@ -17,4 +17,16 @@ func Filter[A any](as []A, keep func(A) bool) (filtered []A) {
 	return filtered
 }
 
-// TODO FilterInPlace
+func FilterInPlace[E any](s []E, keep func(E) bool) []E {
+	var n int
+	for i := range s {
+		if keep(s[i]) {
+			s[n] = s[i]
+			n++
+		}
+	}
+	// clear to prevent memory leaks
+	clear(s[n:])
+	s = s[:n]
+	return s
+}
