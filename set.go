@@ -35,6 +35,15 @@ func (s *Set[V]) Add(v V) (added bool) {
 	}
 }
 
+func (s *Set[V]) Remove(v V) (removed bool) {
+	if s.Contains(v) {
+		delete(s.m, v)
+		return true
+	} else {
+		return false
+	}
+}
+
 func (s *Set[V]) Len() int {
 	return len(s.m)
 }
