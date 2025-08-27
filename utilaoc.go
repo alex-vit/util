@@ -33,7 +33,7 @@ func GridStr(G [][]uint8) string {
 
 // returns non-empty lines
 func NonEmptyLines(s string) (lines []string) {
-	s=strings.TrimSpace(s)
+	s = strings.TrimSpace(s)
 	for _, line := range strings.Split(s, "\n") {
 		if line != "" {
 			lines = append(lines, line)

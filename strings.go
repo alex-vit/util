@@ -15,11 +15,11 @@ func TakeStr(s string, n int) string {
 	return s[:n]
 }
 
-func SplitIntoNonBlanks(s, sep string)[]string {
+func SplitIntoNonBlanks(s, sep string) []string {
 	parts := strings.Split(s, sep)
-	for i:=range parts{
+	for i := range parts {
 		parts[i] = strings.TrimSpace(parts[i])
 	}
-	parts = FilterInPlace(parts, func(s string)bool{return s!=""})
+	parts = FilterInPlace(parts, func(s string) bool { return s != "" })
 	return parts
 }

@@ -44,6 +44,12 @@ func (s *Set[V]) Remove(v V) (removed bool) {
 	}
 }
 
+func (s *Set[V]) RemoveAll(vs ...V) {
+	for _, v := range vs {
+		delete(s.m, v)
+	}
+}
+
 func (s *Set[V]) Len() int {
 	return len(s.m)
 }
