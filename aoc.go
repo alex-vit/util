@@ -7,13 +7,16 @@ import (
 	"strings"
 )
 
+// Utils for Advent of Code.
+
 func Read(file string) string {
 	return strings.TrimSpace(string(Must(os.ReadFile("input.txt"))))
 }
 
+// Deprecated: use [grid.Grid].
 func Grid(input string) [][]uint8 {
 	chars := [][]uint8{}
-	for _, line := range NonEmptyLines(input) {
+	for _, line := range Lines(input) {
 		chars = append(chars, []uint8(line))
 	}
 	return chars
@@ -29,17 +32,6 @@ func GridStr(G [][]uint8) string {
 		sb.WriteString(string(row))
 	}
 	return sb.String()
-}
-
-// returns non-empty lines
-func NonEmptyLines(s string) (lines []string) {
-	s = strings.TrimSpace(s)
-	for _, line := range strings.Split(s, "\n") {
-		if line != "" {
-			lines = append(lines, line)
-		}
-	}
-	return lines
 }
 
 func Blocks(s string) (blocks []string) {
@@ -59,7 +51,7 @@ func Num(s string) int {
 
 func Numbers(input string, separator string) [][]int {
 	numbers := [][]int{}
-	for _, line := range NonEmptyLines(input) {
+	for _, line := range Lines(input) {
 		tokens := strings.Split(line, separator)
 		var row []int
 		for i := range tokens {

@@ -9,14 +9,14 @@ import (
 	"github.com/alex-vit/util"
 )
 
-// Grid is an experimental class to work with AOC grid type puzzles.
+// Grid is an experimental class to work with Advent of Code grid type puzzles.
 type Grid struct {
 	A    [][]byte
 	R, C int
 }
 
 func Parse(s string) *Grid {
-	lines := util.NonEmptyLines(s)
+	lines := util.Lines(s)
 	a := make([][]byte, 0, len(lines))
 	for _, line := range lines {
 		a = append(a, []byte(line))

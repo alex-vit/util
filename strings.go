@@ -2,6 +2,10 @@ package util
 
 import "strings"
 
+func Lines(s string) []string {
+	return strings.FieldsFunc(s, func(r rune) bool { return r == '\n' })
+}
+
 func ContainsIgnoringCase(string, fragment string) bool {
 	string = strings.ToLower(string)
 	fragment = strings.ToLower(fragment)
