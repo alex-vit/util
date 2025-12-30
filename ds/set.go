@@ -1,4 +1,4 @@
-package util
+package ds
 
 import (
 	"fmt"
@@ -35,6 +35,10 @@ func (s *Set[V]) Add(v V) (added bool) {
 	}
 }
 
+func (s *Set[V]) Put(v V) bool {
+	return s.Add(v)
+}
+
 func (s *Set[V]) Remove(v V) (removed bool) {
 	if s.Contains(v) {
 		delete(s.m, v)
@@ -54,9 +58,10 @@ func (s *Set[V]) Len() int {
 	return len(s.m)
 }
 
-func (s *Set[V]) Values() (values []V) {
-	for k := range s.m {
-		values = append(values, k)
+func (s *Set[V]) Values() []V {
+	values := make([]V, 0, s.Len())
+	for v, _ := range s.m {
+		values = append(values, v)
 	}
 	return values
 }
@@ -71,9 +76,9 @@ func (s Set[V]) String() string {
 	var i int
 	for v := range s.m {
 		if i == 0 {
-			sb.WriteString(fmt.Sprintf("%v", v))
+			fmt.Fprintf(&sb, "%v", v)
 		} else {
-			sb.WriteString(fmt.Sprintf(", %v", v))
+			fmt.Fprintf(&sb, ", %v", v)
 		}
 		i++
 	}

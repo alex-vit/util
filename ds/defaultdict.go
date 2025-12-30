@@ -1,4 +1,4 @@
-package util
+package ds
 
 import (
 	"fmt"
@@ -7,8 +7,8 @@ import (
 )
 
 type DefaultDict[K comparable, V any] struct {
-	M  map[K]V
-	mk func() V
+	m             map[K]V
+	createDefault func() V
 }
 
 func NewDefaultDict[K comparable, V any]() *DefaultDict[K, V] {
@@ -19,30 +19,30 @@ func NewDefaultDict[K comparable, V any]() *DefaultDict[K, V] {
 	return NewDefaultDictF[K](mkZero)
 }
 
-func NewDefaultDictF[K comparable, V any](mk func() V) *DefaultDict[K, V] {
-	return &DefaultDict[K, V]{M: make(map[K]V), mk: mk}
+func NewDefaultDictF[K comparable, V any](createDefault func() V) *DefaultDict[K, V] {
+	return &DefaultDict[K, V]{m: make(map[K]V), createDefault: createDefault}
 }
 
 func (d *DefaultDict[K, V]) Get(k K) V {
-	v, ok := d.M[k]
+	v, ok := d.m[k]
 	if !ok {
-		v = d.mk()
-		d.M[k] = v
+		v = d.createDefault()
+		d.m[k] = v
 	}
 	return v
 }
 
 func (d *DefaultDict[K, V]) Put(k K, v V) {
-	d.M[k] = v
+	d.m[k] = v
 }
 
 func (d *DefaultDict[K, V]) Clear() {
-	clear(d.M)
+	clear(d.m)
 }
 
 func (d DefaultDict[K, V]) Keys() iter.Seq[K] {
 	return func(yield func(K) bool) {
-		for k, _ := range d.M {
+		for k, _ := range d.m {
 			if !yield(k) {
 				return
 			}
@@ -50,10 +50,18 @@ func (d DefaultDict[K, V]) Keys() iter.Seq[K] {
 	}
 }
 
+func (d *DefaultDict[K, V]) Values() []V {
+	values := make([]V, 0, len(d.m))
+	for _, v := range d.m {
+		values = append(values, v)
+	}
+	return values
+}
+
 func (d DefaultDict[K, V]) String() string {
 	var sb strings.Builder
 	sb.WriteString("{\n")
-	for k, v := range d.M {
+	for k, v := range d.m {
 		var ks any
 		switch kv := any(k).(type) {
 		case byte:
@@ -63,7 +71,7 @@ func (d DefaultDict[K, V]) String() string {
 		default:
 			ks = kv
 		}
-		sb.WriteString(fmt.Sprintf("  %v: %v\n", ks, v))
+		fmt.Fprintf(&sb, "  %v: %v\n", ks, v)
 	}
 	sb.WriteString("}")
 	return sb.String()

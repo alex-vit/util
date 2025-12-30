@@ -39,7 +39,7 @@ func New(A [][]byte) *Grid {
 	for i, bs := range A {
 		for _, b := range bs {
 			if b > unicode.MaxASCII {
-				// TODO refactor to `Must(TryParse)` to be able to test returned errors
+
 				panic(fmt.Sprintf("line contains unicode, use runes instead: %q", string(bs)))
 			}
 		}

@@ -1,4 +1,4 @@
-package util
+package ds
 
 type Tup[A, B any] struct {
 	A A
