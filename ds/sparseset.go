@@ -62,6 +62,14 @@ func (sp *SparseSet[V]) Get(key int) *V {
 	return &sp.values.Get(valueIndex).B
 }
 
+func (sp *SparseSet[V]) GetOrZero(key int) *V {
+	if !sp.Contains(key) {
+		var zero V
+		return &zero
+	}
+	return sp.Get(key)
+}
+
 // GetAt returns a value at index i. You should prefer Get by id / key.
 func (sp *SparseSet[V]) GetAt(i int) *V {
 	return &sp.values.Get(i).B
@@ -107,4 +115,10 @@ func (sp *SparseSet[V]) Entries() []Tup[int, V] {
 
 func (sp *SparseSet[V]) Len() int {
 	return sp.values.Len()
+}
+
+func (sp *SparseSet[V]) Modify(key int, f func(*V)) {
+	if sp.Contains(key) {
+		f(sp.Get(key))
+	}
 }
