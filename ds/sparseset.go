@@ -2,14 +2,20 @@ package ds
 
 import (
 	"math"
+
+	"github.com/alex-vit/util"
 )
 
 const defaultCapacity = 100
 
+// SparseSet is an int-keyed associative container with O(1) insert, lookup, and delete.
+// Keys are non-negative ints (typically entity IDs). The dense array stores values contiguously,
+// enabling cache-friendly iteration via Entries/Values, while the sparse array maps keys to
+// dense indices. Get returns (value V, found bool) rather than a pointer.
 type SparseSet[V any] struct {
-	// the 'sparse' bit
+	// sparse array: maps key → index into values (-1 = absent)
 	valueIndices []int
-	// 'dense' part
+	// dense array: stores (key, value) pairs contiguously
 	values *Swapback[Tup[int, V]]
 }
 
@@ -24,7 +30,8 @@ func NewSparseSet[V any]() *SparseSet[V] {
 	}
 }
 
-func (sp *SparseSet[V]) Put(key int, value V) *V {
+// Put inserts or replaces the value for key.
+func (sp *SparseSet[V]) Put(key int, value V) {
 	sp.Delete(key)
 
 	valueIndex := sp.values.Len()
@@ -41,33 +48,20 @@ func (sp *SparseSet[V]) Put(key int, value V) *V {
 	}
 
 	sp.valueIndices[key] = valueIndex
-	return sp.Get(key)
 }
 
-func (sp *SparseSet[V]) PutZero(key int) *V {
-	var zero V
-	return sp.Put(key, zero)
-}
-
-func (sp *SparseSet[V]) Get(key int) *V {
+// Get returns the value for key and whether it was found.
+func (sp *SparseSet[V]) Get(key int) (value V, found bool) {
 	if key >= len(sp.valueIndices) {
-		return nil
+		return value, false
 	}
 
 	valueIndex := sp.valueIndices[key]
 	if valueIndex == -1 {
-		return nil
+		return value, false
 	}
 
-	return &sp.values.Get(valueIndex).B
-}
-
-func (sp *SparseSet[V]) GetOrZero(key int) *V {
-	if !sp.Contains(key) {
-		var zero V
-		return &zero
-	}
-	return sp.Get(key)
+	return sp.values.Get(valueIndex).B, true
 }
 
 // GetAt returns a value at index i. You should prefer Get by id / key.
@@ -75,17 +69,7 @@ func (sp *SparseSet[V]) GetAt(i int) *V {
 	return &sp.values.Get(i).B
 }
 
-func (sp *SparseSet[V]) Contains(key int) bool {
-	return sp.Get(key) != nil
-}
-
-func (sp *SparseSet[V]) GetOrPutZero(key int) *V {
-	if !sp.Contains(key) {
-		sp.PutZero(key)
-	}
-	return sp.Get(key)
-}
-
+// Delete removes the value for key. No-op if key is absent.
 func (sp *SparseSet[V]) Delete(key int) {
 	if key >= len(sp.valueIndices) {
 		return
@@ -109,16 +93,16 @@ func (sp *SparseSet[V]) Delete(key int) {
 	sp.valueIndices[keyOfMovedValue] = valueIndex
 }
 
+// Entries returns all (key, value) pairs. The slice is the internal dense array — do not modify.
 func (sp *SparseSet[V]) Entries() []Tup[int, V] {
 	return sp.values.a
 }
 
-func (sp *SparseSet[V]) Len() int {
-	return sp.values.Len()
+// Values returns a new slice containing just the values (without keys).
+func (sp *SparseSet[V]) Values() []V {
+	return util.Map(sp.values.a, func(tup Tup[int, V]) V { return tup.B })
 }
 
-func (sp *SparseSet[V]) Modify(key int, f func(*V)) {
-	if sp.Contains(key) {
-		f(sp.Get(key))
-	}
+func (sp *SparseSet[V]) Len() int {
+	return sp.values.Len()
 }

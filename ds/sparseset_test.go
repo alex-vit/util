@@ -12,13 +12,10 @@ func TestSparseSetAdd(t *testing.T) {
 	sp.Put(2, "2")
 
 	want := []string{"1", "2"}
-	got := []string{}
-	for _, v := range sp.values.a {
-		got = append(got, v.B)
-	}
+	got := sp.Values()
 
 	if !slices.Equal(want, got) {
-		t.Fatalf("expected values of %v but was %v", want, sp.values)
+		t.Fatalf("expected values %v but got %v", want, got)
 	}
 }
 
@@ -26,16 +23,16 @@ func TestSparseSetReplace(t *testing.T) {
 	sp := NewSparseSet[string]()
 
 	sp.Put(1, "1")
-	if "1" != *sp.Get(1) {
+	if v, ok := sp.Get(1); !ok || v != "1" {
 		t.FailNow()
 	}
 
 	sp.Put(1, "2")
-	if "2" != *sp.Get(1) {
+	if v, ok := sp.Get(1); !ok || v != "2" {
 		t.FailNow()
 	}
 
-	if sp.values.Len() > 1 {
+	if sp.Len() > 1 {
 		t.FailNow()
 	}
 }
@@ -50,31 +47,15 @@ func TestSparseSetGet(t *testing.T) {
 
 	for k := range 10 {
 		want := fmt.Sprintf("%d-value", k)
-		got := *sp.Get(k)
-		if want != got {
-			t.Fatalf("expected %d to contain %s but was %s", k, want, got)
+		got, ok := sp.Get(k)
+		if !ok || want != got {
+			t.Fatalf("expected %d to contain %s but was %s (found=%v)", k, want, got, ok)
 		}
 	}
 
-	if nil != sp.Get(2*defaultCapacity) {
-		t.Fatalf("expected no value at 666 but was %v", sp.Get(666))
-	}
-}
-
-func TestGetOrPutZero(t *testing.T) {
-	sp := NewSparseSet[string]()
-	if nil != sp.Get(4) {
-		t.FailNow()
-	}
-
-	var zero string
-	if zero != *sp.GetOrPutZero(4) {
-		t.FailNow()
-	}
-
-	sp.Put(4, "4")
-	if "4" != *sp.GetOrPutZero(4) {
-		t.FailNow()
+	_, ok := sp.Get(2 * defaultCapacity)
+	if ok {
+		t.Fatalf("expected no value at key %d", 2*defaultCapacity)
 	}
 }
 
@@ -96,8 +77,9 @@ func TestSparseSetAddBeyondCapacity(t *testing.T) {
 		sp.Put(kv.key, kv.value)
 	}
 	for _, kv := range kvs {
-		if kv.value != *sp.Get(kv.key) {
-			t.Fatalf("expected %d to contain %s but was %s", kv.key, kv.value, *sp.Get(kv.key))
+		got, ok := sp.Get(kv.key)
+		if !ok || kv.value != got {
+			t.Fatalf("expected %d to contain %s but was %s", kv.key, kv.value, got)
 		}
 	}
 }
@@ -106,7 +88,7 @@ func TestSparseSetDelete(t *testing.T) {
 	sp := NewSparseSet[int]()
 	sp.Put(1, 5)
 	sp.Delete(1)
-	if nil != sp.Get(1) {
+	if _, ok := sp.Get(1); ok {
 		t.FailNow()
 	}
 }
@@ -118,7 +100,7 @@ func TestSparseSetDeleteLast(t *testing.T) {
 	sp.Delete(2)
 	// happy if no panic
 
-	if nil != sp.Get(2) {
+	if _, ok := sp.Get(2); ok {
 		t.FailNow()
 	}
 }
@@ -139,13 +121,26 @@ func TestSparseSetGetAfterDeletes(t *testing.T) {
 	for i := range 10 {
 		k := i + 1
 		if slices.Contains(toDelete, k) {
+			if _, ok := sp.Get(k); ok {
+				t.Fatalf("expected %d to be deleted but it was found", k)
+			}
 			continue
 		}
 		want := fmt.Sprintf("%d-value", k)
-		got := sp.Get(k)
-		if want != *got {
+		got, ok := sp.Get(k)
+		if !ok || want != got {
 			t.Fatalf("expected %d to contain %v but was %v", k, want, got)
 		}
 	}
+}
 
+func TestSparseSetEntries(t *testing.T) {
+	sp := NewSparseSet[string]()
+	sp.Put(3, "three")
+	sp.Put(7, "seven")
+
+	entries := sp.Entries()
+	if len(entries) != 2 {
+		t.Fatalf("expected 2 entries but got %d", len(entries))
+	}
 }
