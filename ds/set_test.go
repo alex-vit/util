@@ -17,8 +17,9 @@ func TestSetAdd(t *testing.T) {
 	}
 	s.Add(7)
 
-	//TODO I think this is flaky? compare contents
-	if !slices.Equal([]int{5, 7}, s.Values()) {
+	got := s.Values()
+	slices.Sort(got)
+	if !slices.Equal([]int{5, 7}, got) {
 		t.FailNow()
 	}
 }
