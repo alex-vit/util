@@ -1,10 +1,6 @@
 package ds
 
-import (
-	"math"
-
-	"github.com/alex-vit/util"
-)
+import "math"
 
 const defaultCapacity = 100
 
@@ -100,7 +96,11 @@ func (sp *SparseSet[V]) Entries() []Tup[int, V] {
 
 // Values returns a new slice containing just the values (without keys).
 func (sp *SparseSet[V]) Values() []V {
-	return util.Map(sp.values.a, func(tup Tup[int, V]) V { return tup.B })
+	vs := make([]V, len(sp.values.a))
+	for i, tup := range sp.values.a {
+		vs[i] = tup.B
+	}
+	return vs
 }
 
 func (sp *SparseSet[V]) Len() int {

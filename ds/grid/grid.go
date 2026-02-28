@@ -5,8 +5,6 @@ import (
 	"iter"
 	"strings"
 	"unicode"
-
-	"github.com/alex-vit/util"
 )
 
 // Grid is an experimental class to work with Advent of Code grid type puzzles.
@@ -16,7 +14,7 @@ type Grid struct {
 }
 
 func Parse(s string) *Grid {
-	lines := util.Lines(s)
+	lines := strings.FieldsFunc(s, func(r rune) bool { return r == '\n' })
 	a := make([][]byte, 0, len(lines))
 	for _, line := range lines {
 		a = append(a, []byte(line))
