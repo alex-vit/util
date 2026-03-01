@@ -30,11 +30,11 @@ func Size(r, c int) *Grid {
 	return New(A)
 }
 
-func New(A [][]byte) *Grid {
-	if len(A) == 0 || len(A[0]) == 0 {
+func New(a [][]byte) *Grid {
+	if len(a) == 0 || len(a[0]) == 0 {
 		panic("empty grid")
 	}
-	for i, bs := range A {
+	for i, bs := range a {
 		for _, b := range bs {
 			if b > unicode.MaxASCII {
 
@@ -42,10 +42,10 @@ func New(A [][]byte) *Grid {
 			}
 		}
 		if i > 0 {
-			prevBs := A[i-1]
+			prevBs := a[i-1]
 			if len(prevBs) != len(bs) {
 				prevLine, line := string(prevBs), string(bs)
-				panic(fmt.Sprintf(`lines of diffrent length:
+				panic(fmt.Sprintf(`lines of different length:
 %d. (%d) %q
 %d. (%d) %q
 `,
@@ -55,8 +55,8 @@ func New(A [][]byte) *Grid {
 		}
 	}
 
-	R, C := len(A), len(A[0])
-	g := &Grid{A: A, R: R, C: C}
+	R, C := len(a), len(a[0])
+	g := &Grid{A: a, R: R, C: C}
 	return g
 }
 
@@ -202,7 +202,7 @@ func norm(dir int) int {
 	if dir == -1 {
 		dir = 3
 	} else if dir > 3 {
-		dir = dir % 4
+		dir %= 4
 	}
 	return dir
 }

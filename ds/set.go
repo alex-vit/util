@@ -60,7 +60,7 @@ func (s *Set[V]) Len() int {
 
 func (s *Set[V]) Values() []V {
 	values := make([]V, 0, s.Len())
-	for v, _ := range s.m {
+	for v := range s.m {
 		values = append(values, v)
 	}
 	return values

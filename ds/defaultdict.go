@@ -42,7 +42,7 @@ func (d *DefaultDict[K, V]) Clear() {
 
 func (d DefaultDict[K, V]) Keys() iter.Seq[K] {
 	return func(yield func(K) bool) {
-		for k, _ := range d.m {
+		for k := range d.m {
 			if !yield(k) {
 				return
 			}

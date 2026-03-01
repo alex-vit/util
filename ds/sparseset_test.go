@@ -70,7 +70,7 @@ func TestSparseSetAddBeyondCapacity(t *testing.T) {
 		value string
 	}{
 		{2 * defaultCapacity, "in a galaxy"},
-		{3 * defaultCapacity, "far far away"},
+		{3 * defaultCapacity, "far far away"}, //nolint:dupword
 	}
 
 	for _, kv := range kvs {

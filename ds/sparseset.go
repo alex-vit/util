@@ -34,7 +34,7 @@ func (sp *SparseSet[V]) Put(key int, value V) {
 	sp.values.Add(Tup[int, V]{key, value})
 
 	if key > cap(sp.valueIndices)-1 {
-		var newCap int = int(math.Round(float64(key) * 1.618))
+		newCap := int(math.Round(float64(key) * 1.618))
 		newValueIndices := make([]int, newCap)
 		for i := range newValueIndices {
 			newValueIndices[i] = -1
